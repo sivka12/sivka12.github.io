@@ -126,7 +126,7 @@
   // Define function for updating balance on the page
   function updateBalance() {
       const balanceDiv = document.getElementById("balance");
-      balanceDiv.innerHTML = `Balance: <b>$${balance}</b>`;
+      balanceDiv.innerHTML = `Balance: <b>$${Beautify(balance)}</b>`;
   }
 
   // Add event listener to handle player bets
