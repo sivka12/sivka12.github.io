@@ -104,7 +104,7 @@
 
   function processBet(bet) {
       if (bet > balance || balance<=0) {
-              addMessage("RoBot", `Sorry, you don't have enough funds to place a bet of <b>$${bet}</b>. Your balance is <b>$${balance}</b>.`);
+              addMessage("RoBot", `Sorry, you don't have enough funds to place a bet of <b>$${Beautify(bet)}</b>. Your balance is <b>$${Beautify(balance)}</b>.`);
               return;
           }
       const randomNumber = numran();
@@ -126,6 +126,7 @@
       balance += winnings;
       winnings = Beautify(winnings);
       updateBalance();
+      bet = Beautify(bet);
       addMessage("user", `[Bet of <b>$${bet}</b> placed. Number was <b>${randomNumber}</b>. Winnings were <b>$${winnings}</b>]`);
 
       if (randomNumber == 100) {
