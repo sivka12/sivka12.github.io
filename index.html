@@ -30,6 +30,10 @@
           padding: 10px;
         }
 
+        #super {
+          border: groove;
+        }
+
         #message-container {
           height: 400px;
           overflow: auto;
@@ -55,66 +59,93 @@
 </div>
 <div id="balance" style="margin-left: 34%;">Balance: $10,000</div>
 <script type="text/javascript">
-    // Define initial balance
-    let balance = 10000;
+  function Beautify(what) //turns 9999999 into 9,999,999
+  {
+      var str = '';
+      what = Math.floor(what);
+      what = (what + '').split('').reverse();
+      for (var i in what) {
+          if (i % 3 == 0 && i > 0) str = ',' + str;
+          str = what[i] + str;
+      }
+      return str;
+  }
+  // Define initial balance
+  let balance = 10000;
 
-    // Define function for adding messages to the chat
-    function addMessage(sender, content) {
+  // Define function for adding messages to the chat
+  function addMessage(sender, content, superp) {
       const messageContainer = document.getElementById("message-container");
       const messageDiv = document.createElement("div");
+      if (superp == "1") {
+          messageDiv.id = "super";
+      }
       messageDiv.classList.add("message");
       messageDiv.innerHTML = `<strong>${sender}:</strong> ${content}`;
       messageContainer.appendChild(messageDiv);
       messageContainer.scrollTop = messageContainer.scrollHeight;
-    }
+  }
 
-    // Define function for processing player bets
-    function processBet(bet) {
-      const randomNumber = Math.floor(Math.random() * 100);
+  // Define function for processing player bets
+  function numran() {
+      min = Math.ceil(0);
+      max = Math.floor(100);
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function processBet(bet) {
+      const randomNumber = numran();
       let winnings = 0;
+      balance -= bet;
       if (randomNumber === 100) {
-        winnings = bet * 10;
+          winnings = bet * 10;
       } else if (randomNumber > 90) {
-        winnings = bet * 4;
+          winnings = bet * 4;
       } else if (randomNumber > 66) {
-        winnings = bet * 2;
+          winnings = bet * 2;
       } else {
-        balance -= bet;
-        addMessage("RoBot", `Sorry, your bet of <b>$${bet}</b> was lost. Your new balance is <b>$${balance}</b>.`);
-        updateBalance();
-        return;
+          bet = Beautify(bet);
+          addMessage("user", `[Bet of <b>$${bet}</b> placed. Number was <b>${randomNumber}</b>]`);
+          addMessage("RoBot", `Sorry, your bet of <b>$${bet}</b> was lost. Your new balance is <b>$${Beautify(balance)}</b>.`);
+          updateBalance();
+          return;
       }
       balance += winnings;
+      winnings = Beautify(winnings);
       updateBalance();
-      addMessage("user", `Bet of <b>$${bet}</b> placed. Number was <b>${randomNumber}</b>. Winnings were <b>$${winnings}</b>.`);
-      addMessage("RoBot", `Congratulations! You won <b>$${winnings}</b>. Your new balance is <b>$${balance}</b>.`);
+      addMessage("user", `[Bet of <b>$${bet}</b> placed. Number was <b>${randomNumber}</b>. Winnings were <b>$${winnings}</b>]`);
 
-    }
+      if (randomNumber == 100) {
+          addMessage("RoBot", `WOW! You won <b>$${winnings}</b>. Number was <b>${randomNumber}</b>. Your new balance is <b>$${Beautify(balance)}</b>.`, "1");
+      } else {
+          addMessage("RoBot", `Congratulations! You won <b>$${winnings}</b>. Your new balance is <b>$${Beautify(balance)}</b>.`);
+      }
 
-    // Define function for updating balance on the page
-    function updateBalance() {
+  }
+
+  // Define function for updating balance on the page
+  function updateBalance() {
       const balanceDiv = document.getElementById("balance");
       balanceDiv.innerHTML = `Balance: <b>$${balance}</b>`;
-    }
+  }
 
-    // Add event listener to handle player bets
-    const messageInput = document.getElementById("message-input");
-    messageInput.addEventListener("keyup", function(event) {
+  // Add event listener to handle player bets
+  const messageInput = document.getElementById("message-input");
+  messageInput.addEventListener("keyup", function(event) {
       if (event.keyCode === 13) { // Enter key
-        const message = messageInput.value;
-        const bet = Number(message.replace(/^\D+/g, "")); // Extract number from message
-        if (bet > balance) {
-          addMessage("RoBot", `Sorry, you don't have enough funds to place a bet of <b>$${bet}</b>. Your balance is <b>$${balance}</b>.`);
-        } else if (bet > 0) {
-          processBet(bet);
-        }
-        messageInput.value = "";
+          const message = messageInput.value;
+          const bet = Number(message.replace(/^\D+/g, "")); // Extract number from message
+          if (bet > balance) {
+              addMessage("RoBot", `Sorry, you don't have enough funds to place a bet of <b>$${bet}</b>. Your balance is <b>$${balance}</b>.`);
+          } else if (bet > 0) {
+              processBet(bet);
+          }
+          messageInput.value = "";
       }
-    });
+  });
 
-    // Display initial balance
-    updateBalance();
-
+  // Display initial balance
+  updateBalance();
 </script>
 </body>
 </html>
